@@ -1,6 +1,7 @@
 """Flask Application for Paws Rescue Center."""
 from flask import Flask, render_template, abort
-from forms import SignUpForm
+from forms import SignUpForm, LoginForm
+from flask import session, redirect, url_for
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dfewfew123213rwdsgert34tgfd1234trgf'
@@ -50,5 +51,29 @@ def signup():
         return render_template("signup.html", message = "Successfully signed up")
     return render_template("signup.html", form = form)
 
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    form = LoginForm()
+    success = False
+    if form.validate_on_submit():
+        print(form.email.data, form.password.data)
+        user = next((user for user in users if (user["email"] == form.email.data and user["password"] == form.password.data)), None)
+        print(user)
+        if user is None:
+            message = "Invalid credentials. Try Again"
+        else:
+            session['user'] = user
+            message = ""
+            success = True
+        return render_template("login.html", form = form, message = message, success = success)
+    return render_template("login.html", form = form)
+
+
+@app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    return redirect(url_for('homepage', _scheme='https', _external=True))
+    
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=3000)
+    app.run(debug=True, host="0.0.0.0", port=5
+    000)
